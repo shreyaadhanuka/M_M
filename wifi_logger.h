@@ -50,7 +50,8 @@ void wifi_init() {
 
 // Log message via HTTP GET request
 void wifi_log(String msg) {
-  if (WiFi.status() == WL_CONNECTED) {
+  msg.replace(" ","%20");
+if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String url = "http://" + ipAddress + ":5000/log?msg=" + msg;
 
