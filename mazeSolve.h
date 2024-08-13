@@ -3,20 +3,23 @@
 #include <vector>
 using namespace std;
 
-Position pos(0, 0, 0);
+Position pos(0, 0, 2);
 
-int orient=0;
+// int orient=0;
 int identifyBlockType() {
   uint8_t a[4], b[4];
   int error = 30;
-  a[0] = sensor3.readRangeSingleMillimeters() < 250;
-  a[1] = sensor1.readRangeSingleMillimeters() < 250;
-  a[3] = sensor2.readRangeSingleMillimeters() < 250;
+  a[0] = sensor3.readRangeSingleMillimeters() < 150;
+  a[1] = sensor2.readRangeSingleMillimeters() < 150;
+  a[3] = sensor1.readRangeSingleMillimeters() < 150;
   a[2] = 0;
 
+  // wifi_log(String(a[0]) + " " + String(a[1]) + " " + String(a[2]) + " " + String(a[3]));
+
   for (int i = 0; i < 4; i++) {
-    b[i] = a[(i + orient) % 4];
+    b[i] = a[(i + pos.orient) % 4];
   }
+  // wifi_log(String(b[0]) + " " + String(b[1]) + " " + String(b[2]) + " " + String(b[3]));
 
   uint8_t type = 8 * b[0] + 4 * b[1] + 2 * b[2] + b[3];
   // print("Block (", pos.x, ", ", pos.y, ") is of type: ", type);
@@ -60,15 +63,16 @@ void floodfill() {
   int b = MAZE_SIZE / 2;
   int a = b - 1;
   memset(flood, -1, MAZE_SIZE * MAZE_SIZE * sizeof(uint8_t));
-  memset(&flood[a][a], 0, 2 * sizeof(uint8_t));
-  memset(&flood[b][a], 0, 2 * sizeof(uint8_t));
+  // memset(&flood[a][a], 0, 2 * sizeof(uint8_t));
+  // memset(&flood[b][a], 0, 2 * sizeof(uint8_t));
+  flood[b][b] = 0;
 
   queue<pair<uint8_t, uint8_t>> q;
   // printMatrix(flood);
 
-  q.push({ a, a });
-  q.push({ a, b });
-  q.push({ b, a });
+  // q.push({ a, a });
+  // q.push({ a, b });
+  // q.push({ b, a });
   q.push({ b, b });
 
   while (!q.empty()) {
