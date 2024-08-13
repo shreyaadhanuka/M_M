@@ -10,6 +10,7 @@ and then use
 wifi_log(String s) to log data
 */
 
+
 // Wi-Fi credentials
 const char* ssid = "MeOrYou";
 const char* password = "12345678";
@@ -50,8 +51,8 @@ void wifi_init() {
 
 // Log message via HTTP GET request
 void wifi_log(String msg) {
-  msg.replace(" ","%20");
-if (WiFi.status() == WL_CONNECTED) {
+  msg.replace(" ", "%20");
+  if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String url = "http://" + ipAddress + ":5000/log?msg=" + msg;
 
