@@ -33,19 +33,19 @@ Position::Position(uint8_t x, uint8_t y, uint8_t orient) {
 void Position::rotateLeft() {
   Serial.print("rotating left");
   orient = (orient + 1) % 4;
-  // rotate(-90); //call rotate function here
+  rotate(-90); //call rotate function here
 }
 
 void Position::rotateRight() {
   Serial.print("rotating right");
   orient = (orient + 3) % 4;
-  // rotate(90); //call rotate function here
+  rotate(90); //call rotate function here
 }
 
 void Position::rotate180() {
   Serial.print("rotating 180");
   orient = (orient + 2) % 4;
-  // rotate(180); //call rotate function here
+  rotate(180); //call rotate function here
 }
 
 void Position::moveTowards(int newOrient) {
