@@ -22,6 +22,9 @@
 #define c1 2.40135
 #define c3 -13.458
 
+#define tofThreshold 150
+
+
 int stateA = 0;
 int stateB = 0;
 
@@ -31,12 +34,33 @@ volatile long leftEncoder = 0;
 float Kp = 1.5;
 float Ki = 0;
 float Kd = 3;
+float encoderP = 0.2 ;
+float encoderD = 0; 
+float leftP = 1.4;
+float leftD = 1.2;
+float rightP = 1.4;
+float rightD = 1.2;
+
+float tof[5]={0,0,0,0,0};
+
+
+float encoderError = 0;
+float encoderLastError = 0;
+float encoderDiff = 0;
+float encoderCorrection = 0;
+float leftError = 0;
+float leftLastError = 0;
+float leftDiff = 0;
+float rightError = 0;
+float rightLastError = 0;
+float rightDiff = 0;
 int PL;
 int IL;
 int DL;
 int lastError = 0;
 
-#define MAZE_SIZE 16
+#define LED 2
+#define MAZE_SIZE 5
 
 uint8_t maze[MAZE_SIZE][MAZE_SIZE];
 uint8_t flood[MAZE_SIZE][MAZE_SIZE];
