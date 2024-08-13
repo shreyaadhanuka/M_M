@@ -2,6 +2,11 @@ VL53L0X sensor1;
 VL53L0X sensor2;
 VL53L0X sensor3;
 
+void tofRead()
+{
+    tof[0] = m1 * sensor1.readRangeSingleMillimeters() + c1;
+    tof[4] = m3 * sensor2.readRangeSingleMillimeters() + c3;
+}
 
 void setID() {
   Wire.begin();
