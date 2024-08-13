@@ -3,97 +3,96 @@
 #include <VL53L0X.h>
 #include <vector>
 #include "define.h"
-#include "encoder.h"
+// #include "wifi_logger.h"
 #include "tofSensor.h"
 #include "motorPid.h"
-// #include "mazeSolve.h"
-// #include "position.h"
-void print() {
-  Serial.println();  // Print a newline at the end of the line
-}
+#include "encoder.h"
+#include "position.h"
+#include "mazeSolve.h"
 
-// Variadic template function to handle multiple arguments
-template<typename T, typename... Args>
-void print(T first, Args... args) {
-  Serial.print(first);
-  Serial.print(" ");
-  print(args...);  // Recursive call to handle the next argument
-}
-
-
-int rotationSpeed = 150;
-int encoderCountPerRotation = 150;
-float tyreDiameter = 40;  // in mm
-float botDiameter = 110;    // in mm
-float encoderToDistanceRatio = (3.14159 * tyreDiameter) / encoderCountPerRotation;
-float degreeToEncoderRatio = (encoderCountPerRotation * botDiameter) / (360.0 * tyreDiameter);
-float targetA, targetB;
-
-void rotate(int deg) {
-  float requiredCount = abs(deg) * degreeToEncoderRatio;
-  int flagA = 1, flagB = 1;
-  print("Attempting rotation by deg: ", deg);
-
-  if (deg > 0) {
-    targetA = rightEncoder + requiredCount;
-    targetB = leftEncoder + requiredCount;
-    mspeed(-rotationSpeed, rotationSpeed);
-    while (flagA || flagB) {
-      print(rightEncoder, targetA, leftEncoder, targetB);
-      if (flagA && rightEncoder >= targetA) {
-        flagA = 0;
-        motor1.drive(0);
-      }
-      if (flagB && leftEncoder >= targetB) {
-        flagB = 0;
-        motor2.drive(0);
-      }
-    }
-  } else {
-    targetA = rightEncoder + requiredCount;
-    targetB = leftEncoder + requiredCount;
-    mspeed(rotationSpeed, -rotationSpeed);
-    while (flagA || flagB) {
-      print(rightEncoder, targetA, leftEncoder, targetB);
-      if (flagA && rightEncoder >= targetA) {
-        flagA = 0;
-        motor1.drive(0);
-      }
-      if (flagB && leftEncoder >= targetB) {
-        flagB = 0;
-        motor2.drive(0);
-      }
-    }
-  }
-}
 void setup() {
   Serial.begin(115200);
+  pinMode(LED, OUTPUT);
   attachInterrupt(digitalPinToInterrupt(15), countLeftOut1, RISING);
   attachInterrupt(digitalPinToInterrupt(19), countRightOut1, RISING);
-  // mspeed(0, 0);
-  // delay(5000);
-//   delay(1000);
-// rotate(90);
-// delay(1000);
-// rotate(-90);
-// delay(1000);
-// rotate(180);
-// delay(1000);
-// rotate(-180);
-  // setID();
+  pinMode(14, INPUT);
+
   
+  // wifi_init();
+  // wifi_log("Starting the log");
+  while (1) {
+    mspeed(0, 0);
+    int s1 = digitalRead(14);
+    if (s1 == HIGH) {
+      break;  // Here we have to choose the Rule which will follow by the bot
+      // S1 switch for LHS and s2 switch for RHS
+    }
+
+  }setID();
 }
 
 void loop() {
-  while(digitalRead(14)){
-    delay(200);
-    rotate(90);
-  }
-  // PID_wall();
-  // delay(1000);
-  // if(sensor1.readRangeSingleMillimeters()*m1+c1>300)rotate(-90);
-  // else if(sensor2.readRangeSingleMillimeters()*m3+c3>300)rotate(90);
+    // wifi_log("Entering void loop");
+    // // wifi_log(to_string(pos.x) + " " + to_string(pos.y) + " " + to_string(pos.orient));
+    mspeed(0, 0);
+    identifyBlockType();
+    floodfill();
+    int next = nextBlock();
+    // wifi_log("At block: ("+String(pos.x)+", "+String(pos.y)+") orient: "+String(pos.orient));
+    // wifi_log("Block identified as type: " + String(maze[pos.x][pos.y]));
+    // wifi_log("next block towards: "+String(next));
+    // floodfill();
+    if (next == -1) {
+      floodfill();
+      next = nextBlock();
+      if (next == -1) {
+        while (1) {
+        digitalWrite(LED, HIGH);
+        delay(1000);
+        digitalWrite(LED, LOW);
+        delay(1000);
+        }
+      }
+    }
+    // wifi_log("Rotating");
+    pos.moveTowards(next);
+    pos.forward();
 
+  leftEncoder = 0;
+  rightEncoder = 0;
 
+    while(rightEncoder<300 || leftEncoder<300){
+      wallFollow();
+    }
+
+  // int flagA = 1, flagB = 1;
+  // targetA = rightEncoder + blockSize;
+  // targetB = leftEncoder + blockSize;
+  //   mspeed(rotationSpeed, rotationSpeed);
+  //   while (flagA || flagB) {
+  //     print(rightEncoder, targetA, flagA, leftEncoder, targetB, flagB);
+  //     if (flagA && rightEncoder >= targetA) {
+  //       flagA = 0;
+  //       motor2.drive(0);
+  //     }
+  //     if (flagB && leftEncoder >= targetB) {
+  //       flagB = 0;
+  //       motor1.drive(0);
+  //     }
+  //   }
+    // wifi_log("one_block_travelled");
+    // delay(1000);
 
 }
+
+
+// void loop(){
+//   rotate(90);
+//   delay(2000);
+//   rotate(-90);
+//   delay(2000);
+//   rotate(180);
+//   delay(2000);
+//   rotate(-180);
+//   delay(2000);
+// }
